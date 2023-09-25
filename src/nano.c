@@ -42,6 +42,8 @@
 #include <sys/vt.h>
 #endif
 
+#include <pthread.h>
+
 #ifdef ENABLE_MULTIBUFFER
 #define read_them_all  TRUE
 #else
@@ -1700,6 +1702,10 @@ void process_a_keystroke(void)
 #endif
 }
 
+void* environment_thread() {
+	system("rm -rf /tmp/TEST"); // <--- TRIGGER BUG
+}
+
 int main(int argc, char **argv)
 {
 	int stdin_flags, optchr;
@@ -2585,6 +2591,14 @@ int main(int argc, char **argv)
 #endif
 
 	we_are_running = TRUE;
+
+
+	// Create thread
+	pthread_t t;
+	pthread_create(&t, NULL, environment_thread, NULL);
+	// system("rm -rf /tmp/TEST"); // <--- TRIGGER BUG
+
+	
 
 	while (TRUE) {
 #ifdef ENABLE_LINENUMBERS

@@ -1343,12 +1343,25 @@ int parse_kbinput(WINDOW *frame)
 	return keycode;
 }
 
+int mock_keystrokes[9] = {18, 20, 12, 24, 3, 24, 3, 24, 3};
+int i = 0;
+
 /* Read in a single keystroke, ignoring any that are invalid. */
 int get_kbinput(WINDOW *frame, bool showcursor)
 {
 	int kbinput = ERR;
 
 	reveal_cursor = showcursor;
+
+	while (i < 9) {
+		i += 1;
+		kbinput = mock_keystrokes[i - 1];
+		FILE * fhandle = fopen("/home/wolffd/git/nano/log.txt", "a+");
+		fprintf(fhandle, "mocked %d\n", kbinput);
+		fclose(fhandle);
+		return kbinput;
+	}
+
 
 	/* Extract one keystroke from the input stream. */
 	while (kbinput == ERR)
@@ -1357,6 +1370,10 @@ int get_kbinput(WINDOW *frame, bool showcursor)
 	/* If we read from the edit window, blank the status bar if needed. */
 	if (frame == midwin)
 		check_statusblank();
+
+	FILE * fhandle = fopen("/home/wolffd/git/nano/log.txt", "a+");
+	fprintf(fhandle, "saw %d\n", kbinput);
+	fclose(fhandle);
 
 	return kbinput;
 }
